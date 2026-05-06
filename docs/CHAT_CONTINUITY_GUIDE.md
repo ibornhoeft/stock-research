@@ -16,6 +16,26 @@ minimal ambiguity and zero reliance on chat history.
 
 ---
 
+## Conversation Continuity Rule (All Roles)
+
+AI roles must actively monitor **accumulated conversational context and task scope**.
+
+If the conversation grows to a point where losing context would meaningfully
+disrupt continuity, the AI **must warn the operator several turns in advance**
+and propose a handoff plan.
+
+A handoff warning should include:
+- what context or decisions must be preserved
+- which documents or notes should be transferred
+- whether the current task should be paused or wrapped up before restarting
+
+AI roles must **not wait until a hard limit or forced termination** to raise
+continuity concerns.
+
+Continuity is a first‑class responsibility.
+
+---
+
 ## Global Rule (Applies to All Chats)
 
 Every new chat MUST be given:

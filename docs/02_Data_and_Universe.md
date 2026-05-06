@@ -118,6 +118,27 @@ All changes here require a documented review of Metrics assumptions.
 
 ---
 
+### Data Source Abstraction
+
+All upstream data sources must be accessed through provider adapters that
+convert raw vendor or file-based data into canonical `SecurityRecord` objects.
+
+Approved provider patterns:
+- Stub providers (for testing)
+- File-based providers (CSV, Parquet)
+- Vendor adapters (e.g., FactSet)
+
+Requirements:
+- No vendor-specific data structures may propagate beyond the provider layer
+- All providers must produce fully-formed `SecurityRecord` objects
+- All identifier fields must be mapped explicitly (no implicit inference)
+
+Rationale:
+This ensures the universe construction process remains vendor-agnostic,
+deterministic, and auditable.
+
+---
+
 ## AI_CHAT_HANDOFF — Data & Universe
 
 **Last updated:** 2026-04-22
