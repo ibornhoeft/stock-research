@@ -43,6 +43,8 @@ A security must satisfy **all** of the following at universe construction
 These filters are **structural**, not strategic, and apply uniformly across all
 strategies.
 
+All inclusion criteria are applied to canonicalized data only. Raw vendor values must not be used directly in inclusion decisions.
+
 ---
 
 ### Exclusion Rules
@@ -75,6 +77,11 @@ Identifier requirements:
 - Identifier mappings must be time-aware (no silent ticker re-use)
 - Corporate action events must preserve identity continuity
 - Downstream modules may not infer identity from ticker alone
+
+Identifier values supplied by upstream data sources must be explicitly mapped
+into canonical identifiers during preprocessing. Vendor-native identifiers
+(e.g., Entity ID, fsym_id) may be used as the internal permanent identifier
+provided they satisfy stability and uniqueness requirements.
 
 ---
 
@@ -136,6 +143,37 @@ Requirements:
 Rationale:
 This ensures the universe construction process remains vendor-agnostic,
 deterministic, and auditable.
+
+---
+
+#### Data Preprocessing and Normalization
+
+All vendor- or file-sourced data must pass through a **preprocessing layer**
+prior to entering provider adapters.
+
+This layer is responsible for transforming raw, potentially inconsistent data
+into the canonical formats expected by the Data & Universe module.
+
+Responsibilities of the preprocessing layer include:
+- Normalization of identifier fields into canonical naming
+- Conversion of date formats into ISO standard (YYYY-MM-DD)
+- Standardization of exchange identifiers (e.g., mapping vendor codes to NYSE, NASDAQ, NYSEAM)
+- Mapping of vendor-specific security types into canonical categories (e.g., SHARE → COMMON_STOCK)
+- Removal or normalization of missing or malformed values (e.g., #N/A, @NA)
+
+The preprocessing layer must be:
+- Deterministic
+- Explicitly defined
+- Fully auditable through code
+
+Provider adapters must assume all input data has already been normalized and
+must not perform additional implicit corrections.
+
+Rationale:
+Separating preprocessing from provider logic ensures that:
+- Raw data remains auditable and reproducible
+- Vendor-specific inconsistencies are isolated
+- The canonical universe definition remains stable and vendor-agnostic
 
 ---
 

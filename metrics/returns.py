@@ -82,3 +82,9 @@ def rolling_cumulative_log_return(
         raise ValueError("window must be a positive integer")
 
     return log_returns.rolling(window=window, min_periods=window).sum()
+
+def simple_returns(prices: pd.Series) -> pd.Series:
+    """
+    Arithmetic returns: (P_t / P_{t-1}) - 1
+    """
+    return prices.pct_change()

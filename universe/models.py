@@ -35,6 +35,7 @@ class SecurityRecord:
     share_class: str                    # e.g. "ORD", "A", "B"
 
     # Descriptive metadata
+    name: Optional[str] = None          # Optional company name
     sector: Optional[str] = None
     industry: Optional[str] = None
 

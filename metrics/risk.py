@@ -135,3 +135,26 @@ def rolling_beta(
 
     beta = cov / var
     return beta
+
+def downside_volatility(log_returns: pd.Series, window: int) -> pd.Series:
+    """
+    Standard deviation of negative returns only.
+    """
+    negative = log_returns.where(log_returns < 0, 0)
+    return negative.rolling(window, min_periods=window).std()
+
+
+def rolling_sharpe_ratio(
+    log_returns: pd.Series,
+    window: int,
+    risk_free_rate: float = 0.0,
+    trading_days: int = 252,
+) -> pd.Series:
+    """
+    Sharpe ratio (no interpretation implied).
+    """
+    excess = log_returns - (risk_free_rate / trading_days)
+    mean = excess.rolling(window, min_periods=window).mean()
+    std = excess.rolling(window, min_periods=window).std()
+
+    return (mean / std) * np.sqrt(trading_days)

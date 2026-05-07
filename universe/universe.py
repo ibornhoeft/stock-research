@@ -35,9 +35,16 @@ def build_universe(
         A filtered, structurally valid investment universe.
     """
 
+    print("Initial:", len(securities))
+
     filtered = filter_by_exchange(securities)
+    print("After exchange filter:", len(filtered))
+
     filtered = filter_by_security_type(filtered)
+    print("After security_type filter:", len(filtered))
+
     filtered = filter_by_data_availability(filtered)
+    print("After data availability filter:", len(filtered))
 
     return Universe(
         as_of_date=as_of_date,

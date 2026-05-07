@@ -82,3 +82,14 @@ def yoy_growth(
         Growth = (X_t / X_{t-periods}) - 1
     """
     return series / series.shift(periods) - 1.0
+
+def asset_turnover(revenue: pd.Series, total_assets: pd.Series):
+    return revenue / total_assets
+
+
+def operating_margin(operating_income: pd.Series, revenue: pd.Series):
+    return operating_income / revenue
+
+
+def free_cash_flow_yield(fcf: pd.Series, market_cap: pd.Series):
+    return fcf / market_cap

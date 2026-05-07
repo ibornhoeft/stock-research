@@ -22,7 +22,7 @@ from universe.universe import build_universe
 from datetime import date
 import os
 
-filepath = "data/raw/universe_stub.csv"
+filepath = "data/processed/factset_sample_clean.csv"
 
 print("File exists:", os.path.exists(filepath))
 print("File path:", filepath)
