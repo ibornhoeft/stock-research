@@ -1,8 +1,19 @@
 SECTION_KEYWORDS = {
-    "thesis": ["investment thesis", "our view", "we believe"],
-    "risks": ["risk", "downside", "headwind"],
-    "catalysts": ["catalyst", "driver", "upside"],
-    "valuation": ["valuation", "price target", "pt"]
+    "thesis": [
+        "company brief",
+        "overview",
+        "analysis",
+        "summary"
+    ],
+    "risks": [
+        "risk",
+        "risk factors",
+        "company specific risk"
+    ],
+    "catalysts": [
+        "catalyst",
+        "drivers"
+    ],
 }
 
 def parse_sections(pages):
