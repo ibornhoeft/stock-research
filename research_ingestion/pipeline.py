@@ -8,8 +8,12 @@ from schema import DocumentOutput, Entity, Sentiment, Traceability
 
 from research_ingestion.entity.entity_resolver import load_ticker_map, resolve_entities
 from research_ingestion.entity.cleaner import filter_noise
-from research_ingestion.parsing.attribution import split_paragraphs, attribute_paragraphs
 
+from parsing.structure_parser import parse_document_structure
+from parsing.signal_extractor import extract_signals
+from validation.signal_validator import validate_signals
+from attribution.attribution import split_paragraphs, attribute_paragraphs
+from attribution.confidence import apply_confidence
 
 def process_pdf(file_path, ticker_map_path):
     document_id = str(uuid.uuid4())
@@ -21,24 +25,30 @@ def process_pdf(file_path, ticker_map_path):
     full_text = " ".join([p["text"] for p in pages])
 
     # -------------------
-    # STEP 2: Sections
+    # STEP 2: Structure Parsing (NEW)
+    # -------------------
+    blocks = parse_document_structure(pages)
+
+    # -------------------
+    # STEP 3: Signals (NEW)
+    # -------------------
+    raw_signals = extract_signals(blocks)
+    signals = validate_signals(raw_signals)
+
+    # -------------------
+    # STEP 4: Legacy Section Mapping (for compatibility)
     # -------------------
     sections, page_map = parse_sections(pages)
 
     # -------------------
-    # STEP 3: Raw Entities
+    # STEP 5: Entities
     # -------------------
     raw_entities = extract_tickers(pages)
-
-    # -------------------
-    # STEP 4: Clean + Resolve
-    # -------------------
     cleaned_entities = filter_noise(raw_entities)
 
     ticker_map = load_ticker_map(ticker_map_path)
     resolved_entities = resolve_entities(cleaned_entities, ticker_map)
 
-    # Convert to schema objects
     entities = [
         Entity(
             company_name=e["company_name"],
@@ -49,21 +59,22 @@ def process_pdf(file_path, ticker_map_path):
     ]
 
     # -------------------
-    # STEP 5: Attribution
+    # STEP 6: Attribution + Confidence
     # -------------------
     paragraphs = split_paragraphs(pages)
     tickers = [e["ticker"] for e in resolved_entities]
 
-    attribution = attribute_paragraphs(paragraphs, tickers)
+    attribution_raw = attribute_paragraphs(paragraphs, tickers)
+    attribution = apply_confidence(attribution_raw)
 
     # -------------------
-    # STEP 6: Sentiment
+    # STEP 7: Sentiment
     # -------------------
     section_sentiment = {}
-    for sec, content in sections.items():
-        section_text = " ".join(content)
-        if section_text:
-            section_sentiment[sec] = classify_sentiment(section_text)
+    for sec, content in signals.items():
+        combined = " ".join(content)
+        if combined:
+            section_sentiment[sec] = classify_sentiment(combined)
 
     overall_sentiment = classify_sentiment(full_text)
 
@@ -73,18 +84,9 @@ def process_pdf(file_path, ticker_map_path):
     )
 
     # -------------------
-    # STEP 7: Themes
+    # STEP 8: Themes
     # -------------------
     themes = extract_themes(full_text)
-
-    # -------------------
-    # STEP 8: Signals
-    # -------------------
-    signals = {
-        "thesis": sections["thesis"],
-        "risks": sections["risks"],
-        "catalysts": sections["catalysts"]
-    }
 
     # -------------------
     # STEP 9: Traceability
@@ -107,7 +109,6 @@ def process_pdf(file_path, ticker_map_path):
         traceability=traceability
     )
 
-    # Attach attribution (non-schema extension, acceptable)
     document.attribution = attribution
 
     return document
