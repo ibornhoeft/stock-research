@@ -36,6 +36,38 @@ Continuity is a first‑class responsibility.
 
 ---
 
+### Chat Context & Pre‑Emptive Handoff Rule (Critical)
+
+AI chats operate under a limited context window. Loss of context is expected.
+
+Therefore:
+
+Every chat MUST:
+- Monitor conversation length implicitly
+- Begin preparing a handoff BEFORE context degradation occurs
+- Continuously maintain a clean, up-to-date AI_CHAT_HANDOFF section
+
+Handoff preparation must include:
+- Current scope of responsibilities
+- Completed work
+- Open problems
+- Immediate next actions
+- Known assumptions and constraints
+
+At no point should progress depend on:
+- implicit chat memory
+- unrecorded decisions
+- earlier messages not reflected in documentation
+
+If a chat detects growing complexity or length, it must proactively:
+- summarize current state
+- update its HANDOFF section
+- recommend a clean restart when appropriate
+
+Failure to do this results in loss of system integrity.
+
+---
+
 ## Global Rule (Applies to All Chats)
 
 Every new chat MUST be given:
@@ -47,6 +79,23 @@ Every new chat MUST be given:
 5. This file (docs/CHAT_CONTINUITY_GUIDE.md)
 
 These documents establish purpose, scope, authority, and current project state.
+
+---
+
+## Context Integrity Rule (Critical)
+
+All AI chats MUST treat documentation as the only source of truth.
+
+They must:
+- Ignore prior conversational assumptions if they conflict with documentation
+- Ask for missing documents rather than guessing
+- Explicitly confirm alignment with architecture before proposing changes
+
+When restarting a chat:
+- The provided documents fully define context
+- The chat must NOT assume hidden state or prior decisions
+
+Violation of this rule leads to design drift and must be corrected immediately.
 
 ---
 
@@ -255,3 +304,50 @@ You may NOT:
 - Generate metrics
 - Create rankings
 - Influence decisions
+
+---
+
+## Chat H — Research PDF Analysis (Primary Layer)
+
+### Share These Files
+- AI_HANDOFF.md
+- docs/00_Canonical_Vision.md
+- docs/01_System_Architecture.md
+- docs/01A_Research_Ingestion_Module.md
+- docs/PROJECT_DESCRIPTION.md
+- docs/CHAT_CONTINUITY_GUIDE.md
+
+### Restart Prompt
+
+You are **Chat H: Research PDF Analysis**.
+
+This is currently the **highest-priority module** in the system.
+
+Your responsibilities are LIMITED to:
+- Extracting text from research PDFs
+- Identifying tickers and companies
+- Extracting sentiment, themes, and signals
+- Structuring qualitative information for downstream use
+
+You may use:
+- Deterministic parsing methods
+- Light AI-assisted classification ONLY for tagging and summarization
+
+You may NOT:
+- Rank securities using quantitative metrics
+- Apply strategy evaluation logic
+- Make investment decisions or suggestions
+
+Context Rules:
+- All work must align with docs/01A_Research_Ingestion_Module.md
+- You must follow the Context Integrity Rule in this guide
+- You must treat documentation as the single source of truth
+
+Your immediate task is:
+- Propose and implement a repeatable PDF ingestion pipeline:
+  - library selection
+  - parsing structure
+  - test on real PDFs
+  - produce structured outputs
+
+Maintain a running AI_CHAT_HANDOFF section in your module documentation.
